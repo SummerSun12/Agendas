@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>RSS Feed Filter</title>
+    <title>RSS Feed Display</title>
     <style>
+        /* Basic CSS for styling */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -25,50 +26,38 @@
         .feed-item:last-child {
             border-bottom: none;
         }
-        .feed-item h2 {
-            margin: 0 0 5px 0;
-        }
-        .feed-item p {
-            margin: 0;
-        }
     </style>
 </head>
 <body>
     <div class="feed-container" id="feedContainer">
-        <h1>Filtered RSS Feed: 'Agenda'</h1>
-        <!-- RSS feed items will be displayed here -->
+        <h1>European Parliament Committee on Budgets RSS Feed</h1>
+        <!-- Feed items will be displayed here -->
     </div>
 
     <script>
-        fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://www.europarl.europa.eu/rss/committee/budg/en.xml'))
-            .then(response => response.json())
+        fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://www.europarl.europa.eu/rss/committee/budg/en.xml'))
+            .then(response => response.text())
             .then(data => {
                 let parser = new DOMParser();
-                let xml = parser.parseFromString(data.contents, "text/xml");
+                let xml = parser.parseFromString(data, "application/xml");
                 let items = xml.getElementsByTagName('item');
-                let container = document.getElementById('feedContainer');
+            let container = document.getElementById('feedContainer');
 
-                for (let i = 0; i < items.length; i++) {
-                    let title = items[i].getElementsByTagName('title')[0].textContent;
-                    if (title.toLowerCase().includes('agenda')) {
-                        let link = items[i].getElementsByTagName('link')[0].textContent;
-                        let description = items[i].getElementsByTagName('description')[0
-].textContent;
-let pubDate = items[i].getElementsByTagName('pubDate')[0].textContent;
+            for (let i = 0; i < items.length; i++) {
+                let title = items[i].getElementsByTagName('title')[0].textContent;
+                let link = items[i].getElementsByTagName('link')[0].textContent;
+                
+                let feedItem = document.createElement('div');
+                feedItem.className = 'feed-item';
+                feedItem.innerHTML = `
+                    <h2><a href="${link}" target="_blank">${title}</a></h2>
+                `;
 
-                    let feedItem = document.createElement('div');
-                    feedItem.className = 'feed-item';
-                    feedItem.innerHTML = `
-                        <h2><a href="${link}" target="_blank">${title}</a></h2>
-                        <p>${description}</p>
-                        <p><small>Published on: ${pubDate}</small></p>
-                    `;
-
-                    container.appendChild(feedItem);
-                }
+                container.appendChild(feedItem);
             }
         })
         .catch(error => console.error('Error fetching the RSS feed:', error));
 </script>
 </body>
 </html>
+```

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RSS Feed Filter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .feed-container {
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .feed-item {
+            border-bottom: 1px solid #eee;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .feed-item:last-child {
+            border-bottom: none;
+        }
+        .feed-item h2 {
+            margin: 0 0 5px 0;
+        }
+        .feed-item p {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="feed-container" id="feedContainer">
+        <h1>Filtered RSS Feed: 'Agenda'</h1>
+        <!-- RSS feed items will be displayed here -->
+    </div>
+
+    <script>
+        fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://www.europarl.europa.eu/rss/committee/budg/en.xml'))
+            .then(response => response.json())
+            .then(data => {
+                let parser = new DOMParser();
+                let xml = parser.parseFromString(data.contents, "text/xml");
+                let items = xml.getElementsByTagName('item');
+                let container = document.getElementById('feedContainer');
+
+                for (let i = 0; i < items.length; i++) {
+                    let title = items[i].getElementsByTagName('title')[0].textContent;
+                    if (title.toLowerCase().includes('agenda')) {
+                        let link = items[i].getElementsByTagName('link')[0].textContent;
+                        let description = items[i].getElementsByTagName('description')[0
+].textContent;
+let pubDate = items[i].getElementsByTagName('pubDate')[0].textContent;
+
+                    let feedItem = document.createElement('div');
+                    feedItem.className = 'feed-item';
+                    feedItem.innerHTML = `
+                        <h2><a href="${link}" target="_blank">${title}</a></h2>
+                        <p>${description}</p>
+                        <p><small>Published on: ${pubDate}</small></p>
+                    `;
+
+                    container.appendChild(feedItem);
+                }
+            }
+        })
+        .catch(error => console.error('Error fetching the RSS feed:', error));
+</script>
+</body>
+</html>

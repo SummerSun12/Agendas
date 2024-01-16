@@ -30,7 +30,7 @@
 </head>
 <body>
     <div class="feed-container" id="feedContainer">
-        <h1>European Parliament Committee on Budgets RSS Feed</h1>
+        <h1>Filtered RSS Feed: 'Draft Agenda'</h1>
         <!-- Feed items will be displayed here -->
     </div>
 
@@ -41,19 +41,24 @@
                 let parser = new DOMParser();
                 let xml = parser.parseFromString(data, "application/xml");
                 let items = xml.getElementsByTagName('item');
-            let container = document.getElementById('feedContainer');
 
-            for (let i = 0; i < items.length; i++) {
-                let title = items[i].getElementsByTagName('title')[0].textContent;
-                let link = items[i].getElementsByTagName('link')[0].textContent;
-                
-                let feedItem = document.createElement('div');
-                feedItem.className = 'feed-item';
-                feedItem.innerHTML = `
-                    <h2><a href="${link}" target="_blank">${title}</a></h2>
-                `;
+                let container = document.getElementById('feedContainer');
 
-                container.appendChild(feedItem);
+                for (let i = 0; i < items.length; i++) {
+                    let title = items[i].getElementsByTagName('title')[0].textContent;
+
+                    // Check if the title contains "Draft agenda"
+                if (title.toLowerCase().includes('draft agenda')) {
+                    let link = items[i].getElementsByTagName('link')[0].textContent;
+                    
+                    let feedItem = document.createElement('div');
+                    feedItem.className = 'feed-item';
+                    feedItem.innerHTML = `
+                        <h2><a href="${link}" target="_blank">${title}</a></h2>
+                    `;
+
+                    container.appendChild(feedItem);
+                }
             }
         })
         .catch(error => console.error('Error fetching the RSS feed:', error));
